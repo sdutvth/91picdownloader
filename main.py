@@ -1,7 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
-
+import threading
 'https://f1022.wonderfulday27.live/forumdisplay.php?fid=21'
+
 
 def get(bbs_url):
     headers = {
@@ -80,14 +81,17 @@ def download(img_url):
         f.write(requests.get(img_url).content)
 
 def main():
-    url = 'https://f1022.wonderfulday27.live/forumdisplay.php?fid=21'
-    bbs_urls = get(url)
-    if not bbs_urls:
-        exit()
-    for bbs in bbs_urls:
-        img_urls = real(bbs)
-        if not img_urls:
-            continue
-        for i in img_urls:
-            download(i)
+    for k in range(1, 10):
+        url = 'https://f1022.wonderfulday27.live/forumdisplay.php?fid=21&page='+str(k)
+        bbs_urls = get(url)
+        if not bbs_urls:
+            exit()
+        for bbs in bbs_urls:
+            img_urls = real(bbs)
+            if not img_urls:
+                continue
+            for i in img_urls:
+                # download(i)
+                t = threading.Thread(target=download, args=(i,))
+                t.start()
 main()
